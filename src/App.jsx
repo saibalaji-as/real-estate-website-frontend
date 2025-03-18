@@ -7,6 +7,7 @@ import Properties from "./pages/Properties";
 import AddProperty from "./pages/AddProperty"; // Import AddProperty page
 
 const App = () => {
+    console.log("App component rendered");
     return (
         <Router>
             <Navbar />
