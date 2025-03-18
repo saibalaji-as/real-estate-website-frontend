@@ -72,66 +72,68 @@ const Properties = () => {
 
     return (
         <div className="container">
-            <h1>Properties</h1>
-
-            {/* Add Property Form */}
-            <div className="add-property-form">
-                <h2>{editingProperty ? "Edit Property" : "Add New Property"}</h2>
-                <form onSubmit={editingProperty ? handleEditProperty : handleAddProperty}>
-                    <input
-                        type="text"
-                        placeholder="Title"
-                        value={editingProperty ? editingProperty.title : newProperty.title}
-                        onChange={(e) =>
-                            editingProperty
-                                ? setEditingProperty({ ...editingProperty, title: e.target.value })
-                                : setNewProperty({ ...newProperty, title: e.target.value })
-                        }
-                    />
-                    <input
-                        type="text"
-                        placeholder="Location"
-                        value={editingProperty ? editingProperty.location : newProperty.location}
-                        onChange={(e) =>
-                            editingProperty
-                                ? setEditingProperty({ ...editingProperty, location: e.target.value })
-                                : setNewProperty({ ...newProperty, location: e.target.value })
-                        }
-                    />
-                    <input
-                        type="number"
-                        placeholder="Price"
-                        value={editingProperty ? editingProperty.price : newProperty.price}
-                        onChange={(e) =>
-                            editingProperty
-                                ? setEditingProperty({ ...editingProperty, price: e.target.value })
-                                : setNewProperty({ ...newProperty, price: e.target.value })
-                        }
-                    />
-                    <button type="submit">{editingProperty ? "Update Property" : "Add Property"}</button>
-                    {editingProperty && (
-                        <button type="button" onClick={() => setEditingProperty(null)}>
-                            Cancel
-                        </button>
-                    )}
-                </form>
-            </div>
-
-            {/* Display Properties */}
             <div>
-                {properties.length > 0 ? (
-                    properties.map((property) => (
-                        <div key={property._id} className="card">
-                            <h2>{property.title}</h2>
-                            <p>{property.location}</p>
-                            <p>₹{property.price}</p>
-                            <button onClick={() => setEditingProperty(property)}>Edit</button>
-                            <button onClick={() => handleDeleteProperty(property._id)}>Delete</button>
-                        </div>
-                    ))
-                ) : (
-                    <p>No properties available</p>
-                )}
+                <h1>Properties</h1>
+
+                {/* Add Property Form */}
+                <div className="add-property-form">
+                    <h2>{editingProperty ? "Edit Property" : "Add New Property"}</h2>
+                    <form onSubmit={editingProperty ? handleEditProperty : handleAddProperty}>
+                        <input
+                            type="text"
+                            placeholder="Title"
+                            value={editingProperty ? editingProperty.title : newProperty.title}
+                            onChange={(e) =>
+                                editingProperty
+                                    ? setEditingProperty({ ...editingProperty, title: e.target.value })
+                                    : setNewProperty({ ...newProperty, title: e.target.value })
+                            }
+                        />
+                        <input
+                            type="text"
+                            placeholder="Location"
+                            value={editingProperty ? editingProperty.location : newProperty.location}
+                            onChange={(e) =>
+                                editingProperty
+                                    ? setEditingProperty({ ...editingProperty, location: e.target.value })
+                                    : setNewProperty({ ...newProperty, location: e.target.value })
+                            }
+                        />
+                        <input
+                            type="number"
+                            placeholder="Price"
+                            value={editingProperty ? editingProperty.price : newProperty.price}
+                            onChange={(e) =>
+                                editingProperty
+                                    ? setEditingProperty({ ...editingProperty, price: e.target.value })
+                                    : setNewProperty({ ...newProperty, price: e.target.value })
+                            }
+                        />
+                        <button type="submit">{editingProperty ? "Update Property" : "Add Property"}</button>
+                        {editingProperty && (
+                            <button type="button" onClick={() => setEditingProperty(null)}>
+                                Cancel
+                            </button>
+                        )}
+                    </form>
+                </div>
+
+                {/* Display Properties */}
+                <div>
+                    {properties.length > 0 ? (
+                        properties.map((property) => (
+                            <div key={property._id} className="card">
+                                <h2>{property.title}</h2>
+                                <p>{property.location}</p>
+                                <p>₹{property.price}</p>
+                                <button onClick={() => setEditingProperty(property)}>Edit</button>
+                                <button onClick={() => handleDeleteProperty(property._id)}>Delete</button>
+                            </div>
+                        ))
+                    ) : (
+                        <p>No properties available</p>
+                    )}
+                </div>
             </div>
         </div>
     );
