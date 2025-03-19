@@ -1,13 +1,18 @@
 import { useEffect, useState } from "react";
+import { Dialog, DialogContent, DialogTitle } from "@mui/material";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import { getProperties, addProperty, editProperty, deleteProperty } from "../api/api";
+import "leaflet/dist/leaflet.css";
 import "../styles/global.css";
 
 const Properties = () => {
     const [properties, setProperties] = useState([]);
-    const [newProperty, setNewProperty] = useState({ title: "", location: "", price: "" });
+    const [newProperty, setNewProperty] = useState({ title: "", location: "", price: "", latitude: "", longitude: "" });
     const [editingProperty, setEditingProperty] = useState(null);
+    const [openMap, setOpenMap] = useState(false);
+    const [mapMode, setMapMode] = useState("add"); // "add" or "edit"
+    const [viewLocation, setViewLocation] = useState(null); // Stores the property to be viewed
 
-    // Fetch properties
     useEffect(() => {
         fetchProperties();
     }, []);
@@ -31,7 +36,7 @@ const Properties = () => {
         try {
             await addProperty(newProperty);
             alert("Property added successfully!");
-            setNewProperty({ title: "", location: "", price: "" });
+            setNewProperty({ title: "", location: "", price: "", latitude: "", longitude: "" });
             fetchProperties();
         } catch (err) {
             alert("Failed to add property!");
@@ -70,12 +75,32 @@ const Properties = () => {
         }
     };
 
+    // Custom Map Click Handler
+    const MapClickHandler = () => {
+        useMapEvents({
+            click(e) {
+                const newLocation = {
+                    latitude: e.latlng.lat,
+                    longitude: e.latlng.lng,
+                    location: `Lat: ${e.latlng.lat}, Lng: ${e.latlng.lng}`,
+                };
+                if (mapMode === "add") {
+                    setNewProperty({ ...newProperty, ...newLocation });
+                } else if (mapMode === "edit") {
+                    setEditingProperty({ ...editingProperty, ...newLocation });
+                }
+                setOpenMap(false);
+            },
+        });
+        return null;
+    };
+
     return (
         <div className="container">
             <div>
                 <h1>Properties</h1>
 
-                {/* Add Property Form */}
+                {/* Add / Edit Property Form */}
                 <div className="add-property-form">
                     <h2>{editingProperty ? "Edit Property" : "Add New Property"}</h2>
                     <form onSubmit={editingProperty ? handleEditProperty : handleAddProperty}>
@@ -93,12 +118,17 @@ const Properties = () => {
                             type="text"
                             placeholder="Location"
                             value={editingProperty ? editingProperty.location : newProperty.location}
-                            onChange={(e) =>
-                                editingProperty
-                                    ? setEditingProperty({ ...editingProperty, location: e.target.value })
-                                    : setNewProperty({ ...newProperty, location: e.target.value })
-                            }
+                            readOnly
                         />
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setMapMode(editingProperty ? "edit" : "add");
+                                setOpenMap(true);
+                            }}
+                        >
+                            📍 Select on Map
+                        </button>
                         <input
                             type="number"
                             placeholder="Price"
@@ -128,6 +158,9 @@ const Properties = () => {
                                 <p>₹{property.price}</p>
                                 <button onClick={() => setEditingProperty(property)}>Edit</button>
                                 <button onClick={() => handleDeleteProperty(property._id)}>Delete</button>
+                                {property.latitude && property.longitude && (
+                                    <button onClick={() => setViewLocation(property)}>📍 View Location</button>
+                                )}
                             </div>
                         ))
                     ) : (
@@ -135,6 +168,40 @@ const Properties = () => {
                     )}
                 </div>
             </div>
+
+            {/* Map Dialog for Selecting Location */}
+            <Dialog open={openMap} onClose={() => setOpenMap(false)} maxWidth="md" fullWidth>
+                <DialogTitle>Select Location on Map</DialogTitle>
+                <DialogContent>
+                    <MapContainer center={[20.5937, 78.9629]} zoom={5} style={{ height: "400px", width: "100%" }}>
+                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                        <MapClickHandler />
+                        {mapMode === "add" && newProperty.latitude && newProperty.longitude && (
+                            <Marker position={[newProperty.latitude, newProperty.longitude]} />
+                        )}
+                        {mapMode === "edit" && editingProperty?.latitude && editingProperty?.longitude && (
+                            <Marker position={[editingProperty.latitude, editingProperty.longitude]} />
+                        )}
+                    </MapContainer>
+                </DialogContent>
+            </Dialog>
+
+            {/* Map Dialog for Viewing Location */}
+            <Dialog open={!!viewLocation} onClose={() => setViewLocation(null)} maxWidth="md" fullWidth>
+                <DialogTitle>Property Location</DialogTitle>
+                <DialogContent>
+                    {viewLocation && (
+                        <MapContainer
+                            center={[viewLocation.latitude, viewLocation.longitude]}
+                            zoom={15}
+                            style={{ height: "400px", width: "100%" }}
+                        >
+                            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                            <Marker position={[viewLocation.latitude, viewLocation.longitude]} />
+                        </MapContainer>
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };
