@@ -132,3 +132,16 @@ body {
     background-color: #dc3545;
 }
 
+.properties-container {
+    height: 70vh;
+}
+
+.properties-container button {
+    border-radius: 5px;
+    margin-block: 10px;
+}
+
+.listing-container {
+    overflow: auto;
+    height: 200px;
+}

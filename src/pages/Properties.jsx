@@ -78,28 +78,43 @@ const Properties = () => {
     // Custom Map Click Handler
     const MapClickHandler = () => {
         useMapEvents({
-            click(e) {
+            click: async (e) => {
+                const address = await getAddress(e.latlng.lat, e.latlng.lng); // Wait for address
+                
                 const newLocation = {
                     latitude: e.latlng.lat,
                     longitude: e.latlng.lng,
-                    location: `Lat: ${e.latlng.lat}, Lng: ${e.latlng.lng}`,
+                    location: address, // Use the resolved address
                 };
+    
                 if (mapMode === "add") {
                     setNewProperty({ ...newProperty, ...newLocation });
                 } else if (mapMode === "edit") {
                     setEditingProperty({ ...editingProperty, ...newLocation });
                 }
+    
                 setOpenMap(false);
             },
         });
+    
         return null;
     };
+    
+    async function getAddress(lat, lon) {
+        try {
+            let response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+            let data = await response.json();
+            return data.display_name; // Return the address
+        } catch (error) {
+            console.error("Error fetching address:", error);
+            return "Unknown Location"; // Default fallback
+        }
+    }
+    
 
     return (
         <div className="container">
-            <div>
-                <h1>Properties</h1>
-
+            <div className="properties-container">
                 {/* Add / Edit Property Form */}
                 <div className="add-property-form">
                     <h2>{editingProperty ? "Edit Property" : "Add New Property"}</h2>
@@ -149,7 +164,7 @@ const Properties = () => {
                 </div>
 
                 {/* Display Properties */}
-                <div>
+                <div className="listing-container">
                     {properties.length > 0 ? (
                         properties.map((property) => (
                             <div key={property._id} className="card">
