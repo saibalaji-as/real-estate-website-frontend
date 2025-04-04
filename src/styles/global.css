@@ -30,6 +30,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    padding-top: 150px;
 }
 
 .login-form {
@@ -37,7 +38,7 @@ body {
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
-    width: 100%;
+    width: 70%;
 }
 
 .form-container {
@@ -143,9 +144,94 @@ body {
 
 .listing-container {
     overflow: auto;
-    height: 200px;
+    /* height: 200px; */
 }
 
 .navigation {
-
+    position: fixed;
+    width: 100vw;
 }
+
+/* Form Container */
+.form-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  /* Input Groups */
+  .input-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.9rem;
+  }
+  
+  .input-group input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    background-color: #fff;
+  }
+  
+  /* Location Fields Layout */
+  .location-fields {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .city-state-fields {
+    flex: 1;
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .country-zip-fields {
+    flex: 1;
+    display: flex;
+    gap: 1rem;
+  }
+  
+  /* Submit Button */
+  .submit-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #4a6bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+  }
+  
+  /* Hover & Focus States */
+  .input-group input:hover {
+    border-color: #4a6bff;
+  }
+  
+  .input-group input:focus {
+    outline: none;
+    border-color: #4a6bff;
+    box-shadow: 0 0 0 2px rgba(74, 107, 255, 0.2);
+  }
+  
+  .submit-btn:hover {
+    background-color: #3a5bef;
+  }

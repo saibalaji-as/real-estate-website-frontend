@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { loginUser } from "../api/api";
 import "../styles/global.css";
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
             const res = await loginUser({ email, password });
-            alert("Login Successful!");
             localStorage.setItem("token", res.data.token);
+            navigate("/properties");
+            window.location.reload();
         } catch (err) {
             alert("Login Failed!");
         }
