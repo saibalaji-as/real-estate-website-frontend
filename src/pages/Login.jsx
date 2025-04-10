@@ -16,9 +16,9 @@ const Login = () => {
             navigate("/properties");
             window.location.reload();
         } catch (err) {
-            if (err.status <= 400) {
+            if (err.status >= 400) {
                 alert("UNAUTHORIZED! Please check your credentials.");
-            } else if (err.status <= 500) {
+            } else if (err.status >= 500) {
                 alert("Internal Server Error!, Try again later.");
             }
         }
