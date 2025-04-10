@@ -11,7 +11,11 @@ const Register = () => {
             await registerUser(user);
             alert("Registration Successful!");
         } catch (err) {
-            alert("Registration Failed!");
+            if (err.status <= 500) {
+                alert("Internal Server Error!, Try again later.");
+            } else if (err.status === 400) {
+                alert("Email already exists!");
+            }
         }
     };
 
