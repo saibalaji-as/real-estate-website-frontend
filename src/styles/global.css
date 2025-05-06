@@ -37,8 +37,17 @@ body {
     background: white;
     padding: 20px;
     border-radius: 5px;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1); */
     width: 70%;
+    background: transparent;
+}
+
+.login-txt {
+    margin-left: 75px;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 30px;
+    font-weight: 600;
+    color: grey;
 }
 
 .form-container {
@@ -234,4 +243,24 @@ body {
   
   .submit-btn:hover {
     background-color: #3a5bef;
+  }
+  .agent-input {
+    display: flex;
+  }
+
+  .agent-input span {
+    margin-bottom: 12px;
+    margin-left: 10px;
+    color: grey;
+    font-size: 14px;
+  }
+  #cust-details .MuiPaper-root {
+    width: fit-content !important;
+    max-height: fit-content !important;
+  }
+  #cust-details .form-container {
+    margin: 0px;
+  }
+  #cust-details .MuiDialogContent-root {
+    padding: 0px !important;
   }

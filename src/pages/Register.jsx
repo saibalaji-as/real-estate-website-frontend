@@ -3,7 +3,7 @@ import { registerUser } from "../api/api";
 import "../styles/global.css";
 
 const Register = () => {
-    const [user, setUser] = useState({ name: "", email: "", password: "" });
+    const [user, setUser] = useState({ name: "", email: "", password: "", agent: false });
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -22,11 +22,15 @@ const Register = () => {
     return (
         <div className="container">
             <div className="login-form">
-                <h2>Register</h2>
+                <h2 className="login-txt">Register</h2>
                 <form className="form-container" onSubmit={handleRegister}>
                     <input type="text" placeholder="Name" value={user.name} onChange={(e) => setUser({ ...user, name: e.target.value })} />
                     <input type="email" placeholder="Email" value={user.email} onChange={(e) => setUser({ ...user, email: e.target.value })} />
                     <input type="password" placeholder="Password" value={user.password} onChange={(e) => setUser({ ...user, password: e.target.value })} />
+                    <div className="agent-input">
+                    <input type="checkbox" value={user.agent} onChange={(e) => setUser({ ...user, agent: e.target.checked })}/>
+                        <span>Agent</span>
+                    </div>
                     <button type="submit">Register</button>
                 </form>
             </div>

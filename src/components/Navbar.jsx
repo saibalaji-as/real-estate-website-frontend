@@ -4,11 +4,12 @@ import logoutIcon from "../assets/logout.png";
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [token, setToken] = useState(localStorage.getItem("token"));
+    const [agent, setAgent] = useState(JSON.parse(localStorage.getItem("userDetails"))?.agent);
 
     function handleLogout() {
         localStorage.removeItem("token");
-        setToken(null);
+        localStorage.removeItem("userDetails");
+        setAgent(null);
         window.location.href = "/";
         window.location.reload();
     }
@@ -21,9 +22,9 @@ const Navbar = () => {
             <div className="hidden md:flex space-x-6">
                 <a href="/" className="text-white text-lg hover:text-gray-200 transition">Home</a>
                 <a href="/properties" className="text-white text-lg hover:text-gray-200 transition">Properties</a>
-                <a style={{ display: token ? 'none' : 'block' }} href="/login" className="text-white text-lg hover:text-gray-200 transition">Login</a>
-                <a style={{ display: token ? 'none' : 'block' }} href="/register" className="text-white text-lg hover:text-gray-200 transition">Register</a>
-                <img style={{ display: token ? 'block' : 'none', width: '20px', cursor: 'pointer' }} onClick={handleLogout} src={logoutIcon}/>
+                <a style={{ display: agent ? 'none' : 'block' }} href="/login" className="text-white text-lg hover:text-gray-200 transition">Login</a>
+                <a style={{ display: agent ? 'none' : 'block' }} href="/register" className="text-white text-lg hover:text-gray-200 transition">Register</a>
+                <img style={{ display: agent ? 'block' : 'none', width: '20px', cursor: 'pointer' }} onClick={handleLogout} src={logoutIcon}/>
             </div>
 
             {/* Hamburger Icon (Visible on small screens) */}
@@ -39,9 +40,9 @@ const Navbar = () => {
                 <div className="absolute top-16 right-4 bg-white shadow-lg p-4 flex flex-col space-y-4 rounded-lg md:hidden">
                     <a href="/" className="text-blue-600 text-lg hover:text-blue-800 transition">Home</a>
                     <a href="/properties" className="text-blue-600 text-lg hover:text-blue-800 transition">Properties</a>
-                    <a style={{ display: token ? 'none' : 'block' }} href="/login" className="text-blue-600 text-lg hover:text-blue-800 transition">Login</a>
-                    <a style={{ display: token ? 'none' : 'block' }} href="/register" className="text-blue-600 text-lg hover:text-blue-800 transition">Register</a>
-                    <a style={{ display: token ? 'block' : 'none', cursor: 'pointer' }} onClick={handleLogout} className="text-blue-600 text-lg hover:text-blue-800 transition">Logout</a>
+                    <a style={{ display: agent ? 'none' : 'block' }} href="/login" className="text-blue-600 text-lg hover:text-blue-800 transition">Login</a>
+                    <a style={{ display: agent ? 'none' : 'block' }} href="/register" className="text-blue-600 text-lg hover:text-blue-800 transition">Register</a>
+                    <a style={{ display: agent ? 'block' : 'none', cursor: 'pointer' }} onClick={handleLogout} className="text-blue-600 text-lg hover:text-blue-800 transition">Logout</a>
                 </div>
             )}
         </nav>

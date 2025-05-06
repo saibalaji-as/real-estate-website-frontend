@@ -13,6 +13,7 @@ const Login = () => {
         try {
             const res = await loginUser({ email, password });
             localStorage.setItem("token", res.data.token);
+            localStorage.setItem("userDetails", JSON.stringify(res.data.user));
             navigate("/properties");
             window.location.reload();
         } catch (err) {
@@ -27,7 +28,7 @@ const Login = () => {
     return (
         <div className="container">
             <div className="login-form">
-                <h2>Login</h2>
+                <h2 className="login-txt">Login</h2>
                 <form className="form-container" onSubmit={handleLogin}>
                     <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
                     <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />

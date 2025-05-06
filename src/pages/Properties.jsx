@@ -13,7 +13,7 @@ const Properties = () => {
     const [openForm, setOpenForm] = useState(false);
     const [mapMode, setMapMode] = useState("add"); // "add" or "edit"
     const [viewLocation, setViewLocation] = useState(null); // Stores the property to be viewed
-    const [token, setToken] = useState(localStorage.getItem("token"));
+    const [agent, setAgent] = useState(JSON.parse(localStorage.getItem("userDetails"))?.agent);
 
     useEffect(() => {
         fetchProperties();
@@ -118,7 +118,7 @@ const Properties = () => {
         <div className="container">
             <div className="properties-container">
                 {/* Add / Edit Property Form */}
-                <div style={{ display: token ? 'block' : 'none' }} className="add-property-form">
+                <div style={{ display: agent ? 'block' : 'none' }} className="add-property-form">
                     <h2>{editingProperty ? "Edit Property" : "Add New Property"}</h2>
                     <form onSubmit={editingProperty ? handleEditProperty : handleAddProperty}>
                         <input
@@ -174,11 +174,11 @@ const Properties = () => {
                                 <p>{property.location}</p>
                                 <p>₹{property.price}</p>
                                 <div style={{ display: 'flex', justifyContent: "flex-start" }}>
-                                    <button style={{ display: token ? 'block' : 'none' }} onClick={() => setEditingProperty(property)}>Edit</button>
-                                    <button style={{ display: token ? 'block' : 'none' }} onClick={() => handleDeleteProperty(property._id)}>Delete</button>
+                                    <button style={{ display: agent ? 'block' : 'none' }} onClick={() => setEditingProperty(property)}>Edit</button>
+                                    <button style={{ display: agent ? 'block' : 'none' }} onClick={() => handleDeleteProperty(property._id)}>Delete</button>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: "flex-start" }}>
-                                    <button onClick={() => setOpenForm(true)} style={{ display: token ? 'none' : 'block' }}>Book/Rent</button>
+                                    <button onClick={() => setOpenForm(true)} style={{ display: agent ? 'none' : 'block' }}>Book/Rent</button>
                                     {property.latitude && property.longitude && (
                                         <button style={{ backgroundColor: 'green' }} onClick={() => setViewLocation(property)}>📍 View Location</button>
                                     )}
@@ -192,8 +192,7 @@ const Properties = () => {
                 </div>
             </div>
 
-            <Dialog open={openForm} onClose={() => setOpenForm(false)} maxWidth="md" fullWidth>
-                <DialogTitle>Customer detail form</DialogTitle>
+            <Dialog id="cust-details" open={openForm} onClose={() => setOpenForm(false)} maxWidth="md" fullWidth>
                 <DialogContent>
                     <form class="form-container">
                         <div class="input-group">
