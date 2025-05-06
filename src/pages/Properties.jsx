@@ -27,9 +27,29 @@ const Properties = () => {
     const [agent, setAgent] = useState(JSON.parse(localStorage.getItem("userDetails"))?.agent);
     const [viewImage, setViewImage] = useState(null);
 
+    // Search and filter states
+    const [searchTerm, setSearchTerm] = useState("");
+    const [priceRange, setPriceRange] = useState([0, 10000000]);
+    const [selectedTypes, setSelectedTypes] = useState([]);
+    const [roomFilter, setRoomFilter] = useState("");
+    const [showFilters, setShowFilters] = useState(false);
+    const [filteredProperties, setFilteredProperties] = useState([]);
+    const [filters, setFilters] = useState({
+        searchTerm: "",
+        city: "",
+        minPrice: "",
+        maxPrice: "",
+        propertyType: "",
+        bedrooms: "",
+      });
+
     useEffect(() => {
         fetchProperties();
     }, []);
+
+    useEffect(() => {
+        filterProperties();
+    }, [properties, searchTerm, priceRange, selectedTypes, roomFilter]);
 
     const fetchProperties = async () => {
         try {
@@ -38,6 +58,78 @@ const Properties = () => {
         } catch (err) {
             console.error("Error fetching properties", err);
         }
+    };
+
+    // Filter properties based on search and filter criteria
+    const filterProperties = () => {
+        let filtered = [...properties];
+        
+        // Search term filter (title, location, description)
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            filtered = filtered.filter(property => 
+                property.title.toLowerCase().includes(term) ||
+                property.location.toLowerCase().includes(term) ||
+                (property.description && property.description.toLowerCase().includes(term))
+            );
+        }
+        
+        // Price range filter
+        filtered = filtered.filter(property => {
+            const price = parseInt(property.price) || 0;
+            return price >= priceRange[0] && price <= priceRange[1];
+        });
+        
+        // Property type filter
+        if (selectedTypes.length > 0) {
+            filtered = filtered.filter(property => 
+                selectedTypes.includes(property.type)
+            );
+        }
+        
+        // Room filter
+        if (roomFilter) {
+            filtered = filtered.filter(property => 
+                property.rooms.toString() === roomFilter
+            );
+        }
+        
+        setFilteredProperties(filtered);
+    };
+
+    // Toggle property type in filter
+    const togglePropertyType = (type) => {
+        if (selectedTypes.includes(type)) {
+            setSelectedTypes(selectedTypes.filter(t => t !== type));
+        } else {
+            setSelectedTypes([...selectedTypes, type]);
+        }
+    };
+
+    // Get unique property types for filter options
+    const getUniquePropertyTypes = () => {
+        const types = new Set();
+        properties.forEach(property => {
+            if (property.type) types.add(property.type);
+        });
+        return Array.from(types);
+    };
+
+    // Get unique room counts for filter options
+    const getUniqueRoomCounts = () => {
+        const counts = new Set();
+        properties.forEach(property => {
+            if (property.rooms) counts.add(property.rooms.toString());
+        });
+        return Array.from(counts).sort((a, b) => a - b);
+    };
+
+    // Reset all filters
+    const resetFilters = () => {
+        setSearchTerm("");
+        setPriceRange([0, Math.max(...properties.map(p => parseInt(p.price) || 0))]);
+        setSelectedTypes([]);
+        setRoomFilter("");
     };
 
     // Add property
@@ -279,10 +371,97 @@ const Properties = () => {
                     </form>
                 </div>
 
+                {/* Search and Filter Section - Add this at the top */}
+                <div className="search-filter-section">
+                    <div className="search-bar">
+                        <input
+                            type="text"
+                            placeholder="Search by title, location or description..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <button
+                            onClick={() => setShowFilters(!showFilters)}
+                            className="filter-toggle"
+                        >
+                            {showFilters ? "Hide Filters" : "Show Filters"}
+                        </button>
+                    </div>
+
+                    {showFilters && (
+                        <div className="filter-options">
+                            <div className="filter-group">
+                                <h4>Price Range (₹)</h4>
+                                <div className="price-range-display">
+                                    ₹{priceRange[0].toLocaleString()} - ₹{priceRange[1].toLocaleString()}
+                                </div>
+                                <div className="price-range-slider">
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max={Math.max(...properties.map(p => parseInt(p.price) || 0))}
+                                        value={priceRange[0]}
+                                        onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])}
+                                    />
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max={Math.max(...properties.map(p => parseInt(p.price) || 0))}
+                                        value={priceRange[1]}
+                                        onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="filter-group">
+                                <h4>Property Type</h4>
+                                <div className="type-filters">
+                                    {getUniquePropertyTypes().map(type => (
+                                        <label key={type} className="filter-checkbox">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedTypes.includes(type)}
+                                                onChange={() => togglePropertyType(type)}
+                                            />
+                                            <span>{type}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="filter-group">
+                                <h4>Rooms</h4>
+                                <div className="room-filters">
+                                    <select
+                                        value={roomFilter}
+                                        onChange={(e) => setRoomFilter(e.target.value)}
+                                    >
+                                        <option value="">All Rooms</option>
+                                        {getUniqueRoomCounts().map(count => (
+                                            <option key={count} value={count}>{count}+ Rooms</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={resetFilters}
+                                className="reset-filters"
+                            >
+                                Reset All Filters
+                            </button>
+                        </div>
+                    )}
+
+                    <div className="results-count">
+                        {filteredProperties.length} properties found
+                    </div>
+                </div>
+
                 {/* Display Properties */}
                 <div className="listing-container">
-                    {properties.length > 0 ? (
-                        properties.map((property) => (
+                    {filteredProperties.length > 0 ? (
+                        filteredProperties.map((property) => (
                             <div key={property._id} className="card">
                                 {property.images && property.images.length > 0 && (
                                     <div style={{ display: 'flex', overflowX: 'auto', gap: '10px', marginBottom: '10px' }}>
