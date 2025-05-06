@@ -7,13 +7,25 @@ import "../styles/global.css";
 
 const Properties = () => {
     const [properties, setProperties] = useState([]);
-    const [newProperty, setNewProperty] = useState({ title: "", location: "", price: "", latitude: "", longitude: "" });
+    const [newProperty, setNewProperty] = useState({
+        title: "",
+        location: "",
+        price: "",
+        latitude: "",
+        longitude: "",
+        type: "",
+        size: "",
+        rooms: "",
+        images: [],
+        description: "",
+    });
     const [editingProperty, setEditingProperty] = useState(null);
     const [openMap, setOpenMap] = useState(false);
     const [openForm, setOpenForm] = useState(false);
     const [mapMode, setMapMode] = useState("add"); // "add" or "edit"
     const [viewLocation, setViewLocation] = useState(null); // Stores the property to be viewed
     const [agent, setAgent] = useState(JSON.parse(localStorage.getItem("userDetails"))?.agent);
+    const [viewImage, setViewImage] = useState(null);
 
     useEffect(() => {
         fetchProperties();
@@ -38,7 +50,18 @@ const Properties = () => {
         try {
             await addProperty(newProperty);
             alert("Property added successfully!");
-            setNewProperty({ title: "", location: "", price: "", latitude: "", longitude: "" });
+            setNewProperty({
+                title: "",
+                location: "",
+                price: "",
+                latitude: "",
+                longitude: "",
+                type: "",
+                size: "",
+                rooms: "",
+                images: [],
+                description: "",
+            });
             fetchProperties();
         } catch (err) {
             alert("Failed to add property!");
@@ -131,21 +154,23 @@ const Properties = () => {
                                     : setNewProperty({ ...newProperty, title: e.target.value })
                             }
                         />
-                        <input
-                            type="text"
-                            placeholder="Location"
-                            value={editingProperty ? editingProperty.location : newProperty.location}
-                            readOnly
-                        />
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setMapMode(editingProperty ? "edit" : "add");
-                                setOpenMap(true);
-                            }}
-                        >
-                            📍 Select on Map
-                        </button>
+                        <div className="location-input">
+                            <input
+                                type="text"
+                                placeholder="Location"
+                                value={editingProperty ? editingProperty.location : newProperty.location}
+                                readOnly
+                            />
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setMapMode(editingProperty ? "edit" : "add");
+                                    setOpenMap(true);
+                                }}
+                            >
+                                📍 Select on Map
+                            </button>
+                        </div>
                         <input
                             type="number"
                             placeholder="Price"
@@ -154,6 +179,95 @@ const Properties = () => {
                                 editingProperty
                                     ? setEditingProperty({ ...editingProperty, price: e.target.value })
                                     : setNewProperty({ ...newProperty, price: e.target.value })
+                            }
+                        />
+                        <input
+                            type="text"
+                            placeholder="Type (e.g. Apartment, Villa)"
+                            value={editingProperty ? editingProperty.type : newProperty.type}
+                            onChange={(e) =>
+                                editingProperty
+                                    ? setEditingProperty({ ...editingProperty, type: e.target.value })
+                                    : setNewProperty({ ...newProperty, type: e.target.value })
+                            }
+                        />
+                        <input
+                            type="text"
+                            placeholder="Size (e.g. 1200 sqft)"
+                            value={editingProperty ? editingProperty.size : newProperty.size}
+                            onChange={(e) =>
+                                editingProperty
+                                    ? setEditingProperty({ ...editingProperty, size: e.target.value })
+                                    : setNewProperty({ ...newProperty, size: e.target.value })
+                            }
+                        />
+                        <input
+                            type="number"
+                            placeholder="Number of Rooms"
+                            value={editingProperty ? editingProperty.rooms : newProperty.rooms}
+                            onChange={(e) =>
+                                editingProperty
+                                    ? setEditingProperty({ ...editingProperty, rooms: e.target.value })
+                                    : setNewProperty({ ...newProperty, rooms: e.target.value })
+                            }
+                        />
+                        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '10px' }}>
+                            {(editingProperty ? editingProperty.images : newProperty.images).map((img, idx) => (
+                                <img
+                                    key={idx}
+                                    src={img}
+                                    alt={`preview-${idx}`}
+                                    style={{ width: '100px', height: '80px', objectFit: 'cover', borderRadius: '5px' }}
+                                />
+                            ))}
+                        </div>
+
+                        {/* Image URL Input */}
+                        <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                            <input
+                                type="text"
+                                placeholder="Paste image URL here"
+                                onChange={(e) => {
+                                    if (editingProperty) {
+                                        setEditingProperty({ ...editingProperty, image: e.target.value });
+                                    } else {
+                                        setNewProperty({ ...newProperty, image: e.target.value });
+                                    }
+                                }}
+                            />
+                            <button
+                                style={{ marginTop: '0px' }}
+                                type="button"
+                                onClick={() => {
+                                    const url = editingProperty ? editingProperty.image : newProperty.image;
+                                    if (!url) return;
+                                    if (editingProperty) {
+                                        setEditingProperty({
+                                            ...editingProperty,
+                                            images: [...(editingProperty.images || []), url],
+                                            image: "",
+                                        });
+                                    } else {
+                                        setNewProperty({
+                                            ...newProperty,
+                                            images: [...(newProperty.images || []), url],
+                                            image: "",
+                                        });
+                                    }
+                                }}
+                            >
+                                Add
+                            </button>
+                        </div>
+
+                        <textarea
+                            className="text-area"
+                            placeholder="Description"
+                            value={editingProperty ? editingProperty.description : newProperty.description}
+                            onChange={(e) =>
+                                editingProperty
+                                    ? setEditingProperty({ ...editingProperty, description: e.target.value })
+                                    : setNewProperty({ ...newProperty, description: e.target.value })
                             }
                         />
                         <button type="submit">{editingProperty ? "Update Property" : "Add Property"}</button>
@@ -170,9 +284,33 @@ const Properties = () => {
                     {properties.length > 0 ? (
                         properties.map((property) => (
                             <div key={property._id} className="card">
+                                {property.images && property.images.length > 0 && (
+                                    <div style={{ display: 'flex', overflowX: 'auto', gap: '10px', marginBottom: '10px' }}>
+                                        {property.images.map((img, idx) => (
+                                            <img
+                                                key={idx}
+                                                src={img}
+                                                alt={`img-${idx}`}
+                                                onClick={() => setViewImage(img)}
+                                                style={{
+                                                    width: '150px',
+                                                    height: '100px',
+                                                    objectFit: 'cover',
+                                                    borderRadius: '8px',
+                                                    cursor: 'pointer',
+                                                    border: '1px solid #ccc'
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
                                 <h2>{property.title}</h2>
-                                <p>{property.location}</p>
-                                <p>₹{property.price}</p>
+                                <p><strong>Type:</strong> {property.type}</p>
+                                <p><strong>Location:</strong> {property.location}</p>
+                                <p><strong>Price:</strong> ₹{property.price}</p>
+                                <p><strong>Size:</strong> {property.size}</p>
+                                <p><strong>Rooms:</strong> {property.rooms}</p>
+                                <p>{property.description}</p>
                                 <div style={{ display: 'flex', justifyContent: "flex-start" }}>
                                     <button style={{ display: agent ? 'block' : 'none' }} onClick={() => setEditingProperty(property)}>Edit</button>
                                     <button style={{ display: agent ? 'block' : 'none' }} onClick={() => handleDeleteProperty(property._id)}>Delete</button>
@@ -192,49 +330,60 @@ const Properties = () => {
                 </div>
             </div>
 
+            {/* Image viewer */}
+            <Dialog open={!!viewImage} onClose={() => setViewImage(null)} maxWidth="md">
+                <DialogContent style={{ padding: 0, background: '#000' }}>
+                    <img
+                        src={viewImage}
+                        alt="Full View"
+                        style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
+                    />
+                </DialogContent>
+            </Dialog>
+
             <Dialog id="cust-details" open={openForm} onClose={() => setOpenForm(false)} maxWidth="md" fullWidth>
                 <DialogContent>
                     <form class="form-container">
                         <div class="input-group">
                             <label>Name</label>
-                            <input type="text" placeholder="John Doe"/>
+                            <input type="text" placeholder="John Doe" />
                         </div>
 
                         <div class="input-group">
                             <label>Email</label>
-                            <input type="email" placeholder="john@example.com"/>
+                            <input type="email" placeholder="john@example.com" />
                         </div>
 
                         <div class="input-group">
                             <label>Phone</label>
-                            <input type="tel" placeholder="+91 9876543210"/>
+                            <input type="tel" placeholder="+91 9876543210" />
                         </div>
 
                         <div class="input-group">
                             <label>Address</label>
-                            <input type="text" placeholder="123 Main St"/>
+                            <input type="text" placeholder="123 Main St" />
                         </div>
 
                         <div class="location-fields">
                             <div class="city-state-fields">
                                 <div class="input-group">
                                     <label>City</label>
-                                    <input type="text" placeholder="Chennai"/>
+                                    <input type="text" placeholder="Chennai" />
                                 </div>
                                 <div class="input-group">
                                     <label>State</label>
-                                    <input type="text" placeholder="TN"/>
+                                    <input type="text" placeholder="TN" />
                                 </div>
                             </div>
 
                             <div class="country-zip-fields">
                                 <div class="input-group">
                                     <label>Country</label>
-                                    <input type="text" placeholder="India"/>
+                                    <input type="text" placeholder="India" />
                                 </div>
                                 <div class="input-group">
                                     <label>ZIP Code</label>
-                                    <input type="text" placeholder="10001"/>
+                                    <input type="text" placeholder="10001" />
                                 </div>
                             </div>
                         </div>

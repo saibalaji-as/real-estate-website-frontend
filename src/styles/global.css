@@ -264,3 +264,19 @@ body {
   #cust-details .MuiDialogContent-root {
     padding: 0px !important;
   }
+
+  .text-area {
+    border: 1px solid rgb(220, 220, 220);
+    border-radius: 5px;
+    width: 100%;
+    padding: 10px;
+  }
+  .location-input {
+    display: flex;
+  }
+
+  .location-input button {
+    margin-top: 0px !important;
+    width: 200px;
+    margin-left: 20px;
+  }
