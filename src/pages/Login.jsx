@@ -14,7 +14,11 @@ const Login = () => {
             const res = await loginUser({ email, password });
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("userDetails", JSON.stringify(res.data.user));
-            navigate("/properties");
+            if (res.data.user.agent) {
+                navigate("/");
+            } else {
+                navigate("/properties");
+            }
             window.location.reload();
         } catch (err) {
             if (err.status >= 400) {

@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react"; // Lucide icons for hamburger and close
 import logoutIcon from "../assets/logout.png";
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [agent, setAgent] = useState(JSON.parse(localStorage.getItem("userDetails"))?.agent);
+    const navigate = useNavigate();
 
     function handleLogout() {
+        navigate("/");
         localStorage.removeItem("token");
         localStorage.removeItem("userDetails");
-        setAgent(null);
-        window.location.href = "/";
         window.location.reload();
     }
 

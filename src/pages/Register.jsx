@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { registerUser } from "../api/api";
 import "../styles/global.css";
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
     const [user, setUser] = useState({ name: "", email: "", password: "", agent: false });
+    const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault();
         try {
             await registerUser(user);
             alert("Registration Successful!");
+            navigate("/login");
         } catch (err) {
             if (err.status >= 500) {
                 alert("Internal Server Error!, Try again later.");

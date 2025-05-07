@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@mui/material";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
-import { getProperties, addProperty, editProperty, deleteProperty } from "../api/api";
+import { getProperties, addProperty, editProperty, deleteProperty, contact } from "../api/api";
 import "leaflet/dist/leaflet.css";
 import "../styles/global.css";
 
@@ -24,7 +24,7 @@ const Properties = () => {
     const [openForm, setOpenForm] = useState(false);
     const [mapMode, setMapMode] = useState("add"); // "add" or "edit"
     const [viewLocation, setViewLocation] = useState(null); // Stores the property to be viewed
-    const [agent, setAgent] = useState(JSON.parse(localStorage.getItem("userDetails"))?.agent);
+    const [userDetails, setUserDetails] = useState(JSON.parse(localStorage.getItem("userDetails")));
     const [viewImage, setViewImage] = useState(null);
 
     // Search and filter states
@@ -43,6 +43,60 @@ const Properties = () => {
         bedrooms: "",
       });
 
+    /* Contact form */
+    const [selectedProperty, setSelectedProperty] = useState(null);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        address: '',
+        city: '',
+        state: '',
+        country: '',
+        zipCode: '',
+        property: {}
+    });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            formData.property = selectedProperty;
+            const response = await contact(formData);
+
+            if (!response) {
+                throw new Error('Failed to submit form');
+            }
+
+            alert("Form submitted successfully! Our executive will contact you soon...");
+            setOpenForm(false);
+            // Reset form
+            setFormData({
+                name: '',
+                email: '',
+                phone: '',
+                address: '',
+                city: '',
+                state: '',
+                country: '',
+                zipCode: '',
+                property: {}
+            });
+        } catch (error) {
+            console.log('Error submitting form:', error);
+            alert("Failed to submit form. Please try again.");
+        }
+    };
+    /* Contact form */
+    
+
     useEffect(() => {
         fetchProperties();
     }, []);
@@ -53,7 +107,12 @@ const Properties = () => {
 
     const fetchProperties = async () => {
         try {
-            const res = await getProperties();
+            // Create query parameters
+            const params = {};
+            if (userDetails?.agent) {
+                params.userId = userDetails.userId;
+            }
+            const res = await getProperties({params: params});
             setProperties(res.data);
         } catch (err) {
             console.error("Error fetching properties", err);
@@ -140,6 +199,7 @@ const Properties = () => {
             return;
         }
         try {
+            newProperty.userId = userDetails.userId;
             await addProperty(newProperty);
             alert("Property added successfully!");
             setNewProperty({
@@ -233,7 +293,7 @@ const Properties = () => {
         <div className="container">
             <div className="properties-container">
                 {/* Add / Edit Property Form */}
-                <div style={{ display: agent ? 'block' : 'none' }} className="add-property-form">
+                <div style={{ display: userDetails?.agent ? 'block' : 'none' }} className="add-property-form">
                     <h2>{editingProperty ? "Edit Property" : "Add New Property"}</h2>
                     <form onSubmit={editingProperty ? handleEditProperty : handleAddProperty}>
                         <input
@@ -491,11 +551,11 @@ const Properties = () => {
                                 <p><strong>Rooms:</strong> {property.rooms}</p>
                                 <p>{property.description}</p>
                                 <div style={{ display: 'flex', justifyContent: "flex-start" }}>
-                                    <button style={{ display: agent ? 'block' : 'none' }} onClick={() => setEditingProperty(property)}>Edit</button>
-                                    <button style={{ display: agent ? 'block' : 'none' }} onClick={() => handleDeleteProperty(property._id)}>Delete</button>
+                                    <button style={{ display: userDetails?.agent ? 'block' : 'none' }} onClick={() => setEditingProperty(property)}>Edit</button>
+                                    <button style={{ display: userDetails?.agent ? 'block' : 'none' }} onClick={() => handleDeleteProperty(property._id)}>Delete</button>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: "flex-start" }}>
-                                    <button onClick={() => setOpenForm(true)} style={{ display: agent ? 'none' : 'block' }}>Book/Rent</button>
+                                    <button onClick={() => {setOpenForm(true); setSelectedProperty(property)}} style={{ display: userDetails?.agent ? 'none' : 'block' }}>Contact agent</button>
                                     {property.latitude && property.longitude && (
                                         <button style={{ backgroundColor: 'green' }} onClick={() => setViewLocation(property)}>📍 View Location</button>
                                     )}
@@ -520,57 +580,116 @@ const Properties = () => {
                 </DialogContent>
             </Dialog>
 
-            <Dialog id="cust-details" open={openForm} onClose={() => setOpenForm(false)} maxWidth="md" fullWidth>
+            <Dialog
+                id="cust-details"
+                open={openForm}
+                onClose={() => setOpenForm(false)}
+                maxWidth="md"
+                fullWidth
+            >
                 <DialogContent>
-                    <form class="form-container">
-                        <div class="input-group">
+                    <form className="form-container" onSubmit={handleSubmit}>
+                        <div className="input-group">
                             <label>Name</label>
-                            <input type="text" placeholder="John Doe" />
+                            <input
+                                type="text"
+                                name="name"
+                                placeholder="John Doe"
+                                value={formData.name}
+                                onChange={handleChange}
+                                required
+                            />
                         </div>
 
-                        <div class="input-group">
+                        <div className="input-group">
                             <label>Email</label>
-                            <input type="email" placeholder="john@example.com" />
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder="john@example.com"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                            />
                         </div>
 
-                        <div class="input-group">
+                        <div className="input-group">
                             <label>Phone</label>
-                            <input type="tel" placeholder="+91 9876543210" />
+                            <input
+                                type="tel"
+                                name="phone"
+                                placeholder="+91 9876543210"
+                                value={formData.phone}
+                                onChange={handleChange}
+                                required
+                            />
                         </div>
 
-                        <div class="input-group">
+                        <div className="input-group">
                             <label>Address</label>
-                            <input type="text" placeholder="123 Main St" />
+                            <input
+                                type="text"
+                                name="address"
+                                placeholder="123 Main St"
+                                value={formData.address}
+                                onChange={handleChange}
+                                required
+                            />
                         </div>
 
-                        <div class="location-fields">
-                            <div class="city-state-fields">
-                                <div class="input-group">
+                        <div className="location-fields">
+                            <div className="city-state-fields">
+                                <div className="input-group">
                                     <label>City</label>
-                                    <input type="text" placeholder="Chennai" />
+                                    <input
+                                        type="text"
+                                        name="city"
+                                        placeholder="Chennai"
+                                        value={formData.city}
+                                        onChange={handleChange}
+                                        required
+                                    />
                                 </div>
-                                <div class="input-group">
+                                <div className="input-group">
                                     <label>State</label>
-                                    <input type="text" placeholder="TN" />
+                                    <input
+                                        type="text"
+                                        name="state"
+                                        placeholder="TN"
+                                        value={formData.state}
+                                        onChange={handleChange}
+                                        required
+                                    />
                                 </div>
                             </div>
 
-                            <div class="country-zip-fields">
-                                <div class="input-group">
+                            <div className="country-zip-fields">
+                                <div className="input-group">
                                     <label>Country</label>
-                                    <input type="text" placeholder="India" />
+                                    <input
+                                        type="text"
+                                        name="country"
+                                        placeholder="India"
+                                        value={formData.country}
+                                        onChange={handleChange}
+                                        required
+                                    />
                                 </div>
-                                <div class="input-group">
+                                <div className="input-group">
                                     <label>ZIP Code</label>
-                                    <input type="text" placeholder="10001" />
+                                    <input
+                                        type="text"
+                                        name="zipCode"
+                                        placeholder="10001"
+                                        value={formData.zipCode}
+                                        onChange={handleChange}
+                                        required
+                                    />
                                 </div>
                             </div>
                         </div>
 
-                        <button class="submit-btn" type="submit" onClick={() => {
-                            alert("Form submitted successfully!, Our executuve will contact you soon...");
-                            setOpenForm(false)
-                        }}>
+                        <button className="submit-btn" type="submit">
                             Submit
                         </button>
                     </form>
