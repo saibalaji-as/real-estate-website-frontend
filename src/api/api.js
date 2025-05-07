@@ -11,8 +11,8 @@ export const loginUser = async (userData) => {
     return await axios.post(`${API_URL}/auth/login`, userData);
 };
 
-export const getProperties = async () => {
-    return await axios.get(`${API_URL}/properties`);
+export const getProperties = async (params) => {
+    return await axios.get(`${API_URL}/properties`, params);
 };
 
 export const addProperty = async (propertyData) => {
@@ -25,4 +25,8 @@ export const editProperty = async (id, updatedData) => {
 
 export const deleteProperty = async (id) => {
     return await axios.delete(`${API_URL}/properties/${id}`);
+};
+
+export const contact = async (data) => {
+    return await axios.post(`${API_URL}/contact`, data);
 };
