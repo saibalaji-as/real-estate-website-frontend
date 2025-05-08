@@ -54,6 +54,7 @@ const Properties = () => {
         state: '',
         country: '',
         zipCode: '',
+        userId: '',
         property: {}
     });
 
@@ -68,6 +69,7 @@ const Properties = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            formData.userId = selectedProperty.userId;
             formData.property = selectedProperty;
             const response = await contact(formData);
 
@@ -87,6 +89,7 @@ const Properties = () => {
                 state: '',
                 country: '',
                 zipCode: '',
+                userId: '',
                 property: {}
             });
         } catch (error) {
@@ -379,6 +382,7 @@ const Properties = () => {
                             <input
                                 type="text"
                                 placeholder="Paste image URL here"
+                                value={editingProperty ? editingProperty.image : newProperty.image}
                                 onChange={(e) => {
                                     if (editingProperty) {
                                         setEditingProperty({ ...editingProperty, image: e.target.value });
@@ -397,19 +401,20 @@ const Properties = () => {
                                         setEditingProperty({
                                             ...editingProperty,
                                             images: [...(editingProperty.images || []), url],
-                                            image: "",
+                                            image: "", // This clears the input
                                         });
                                     } else {
                                         setNewProperty({
                                             ...newProperty,
                                             images: [...(newProperty.images || []), url],
-                                            image: "",
+                                            image: "", // This clears the input
                                         });
                                     }
                                 }}
                             >
                                 Add
                             </button>
+
                         </div>
 
                         <textarea

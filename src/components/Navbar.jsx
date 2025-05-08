@@ -16,37 +16,56 @@ const Navbar = () => {
     }
 
     return (
-        <nav className="navigation bg-blue-600 p-4 shadow-md flex justify-between items-center">
-            <h1 className="text-white text-2xl font-bold">Sai Real Estate</h1>
+        <nav className="navigation bg-gradient-to-r from-blue-700 to-blue-500 px-6 py-4 shadow-lg fixed w-full top-0 z-50 flex justify-between items-center">
+            <h1 className="text-white text-3xl font-extrabold tracking-wide drop-shadow-lg">Sai Real Estate</h1>
 
-            {/* Desktop Links (Hidden on small screens) */}
-            <div className="hidden md:flex space-x-6">
-                <a href="/" className="text-white text-lg hover:text-gray-200 transition">Home</a>
-                <a href="/properties" className="text-white text-lg hover:text-gray-200 transition">Properties</a>
-                <a style={{ display: agent ? 'none' : 'block' }} href="/login" className="text-white text-lg hover:text-gray-200 transition">Login</a>
-                <a style={{ display: agent ? 'none' : 'block' }} href="/register" className="text-white text-lg hover:text-gray-200 transition">Register</a>
-                <img style={{ display: agent ? 'block' : 'none', width: '20px', cursor: 'pointer' }} onClick={handleLogout} src={logoutIcon}/>
+            {/* Desktop Links */}
+            <div className="hidden md:flex space-x-8 items-center">
+                <a href="/" className="text-white text-lg hover:text-yellow-300 transition duration-300 ease-in-out">Home</a>
+                <a href="/properties" className="text-white text-lg hover:text-yellow-300 transition duration-300 ease-in-out">Properties</a>
+                {!agent && (
+                    <>
+                        <a href="/login" className="text-white text-lg hover:text-yellow-300 transition duration-300 ease-in-out">Login</a>
+                        <a href="/register" className="text-white text-lg hover:text-yellow-300 transition duration-300 ease-in-out">Register</a>
+                    </>
+                )}
+                {agent && (
+                    <img
+                        onClick={handleLogout}
+                        src={logoutIcon}
+                        alt="Logout"
+                        className="w-6 h-6 cursor-pointer hover:scale-110 transition-transform duration-300"
+                        title="Logout"
+                    />
+                )}
             </div>
 
-            {/* Hamburger Icon (Visible on small screens) */}
-            <button 
-                className="md:hidden text-white focus:outline-none" 
+            {/* Hamburger Icon for Mobile */}
+            <button
+                className="md:hidden text-white focus:outline-none transition-transform duration-200"
                 onClick={() => setIsOpen(!isOpen)}
             >
-                {isOpen ? <X size={28} /> : <Menu size={28} />}  
+                {isOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
 
-            {/* Mobile Menu (Shown when isOpen is true) */}
+            {/* Mobile Menu */}
             {isOpen && (
-                <div className="absolute top-16 right-4 bg-white shadow-lg p-4 flex flex-col space-y-4 rounded-lg md:hidden">
-                    <a href="/" className="text-blue-600 text-lg hover:text-blue-800 transition">Home</a>
-                    <a href="/properties" className="text-blue-600 text-lg hover:text-blue-800 transition">Properties</a>
-                    <a style={{ display: agent ? 'none' : 'block' }} href="/login" className="text-blue-600 text-lg hover:text-blue-800 transition">Login</a>
-                    <a style={{ display: agent ? 'none' : 'block' }} href="/register" className="text-blue-600 text-lg hover:text-blue-800 transition">Register</a>
-                    <a style={{ display: agent ? 'block' : 'none', cursor: 'pointer' }} onClick={handleLogout} className="text-blue-600 text-lg hover:text-blue-800 transition">Logout</a>
+                <div className="absolute top-16 right-4 w-56 bg-white rounded-xl shadow-2xl py-4 px-6 flex flex-col space-y-4 z-50 md:hidden">
+                    <a href="/" className="text-blue-600 text-lg hover:text-blue-800 transition font-medium">Home</a>
+                    <a href="/properties" className="text-blue-600 text-lg hover:text-blue-800 transition font-medium">Properties</a>
+                    {!agent && (
+                        <>
+                            <a href="/login" className="text-blue-600 text-lg hover:text-blue-800 transition font-medium">Login</a>
+                            <a href="/register" className="text-blue-600 text-lg hover:text-blue-800 transition font-medium">Register</a>
+                        </>
+                    )}
+                    {agent && (
+                        <a onClick={handleLogout} className="text-blue-600 text-lg hover:text-blue-800 transition font-medium cursor-pointer">Logout</a>
+                    )}
                 </div>
             )}
         </nav>
+
     );
 };
 
