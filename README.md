@@ -1,3 +1,6 @@
+**Real estate Application work flow Documentation:**
+https://docs.google.com/document/d/1HlSLW74XJW9ltt70dv9uxAMq2ZuNYwnTcXaR6zPBpGo/edit?usp=sharing
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
