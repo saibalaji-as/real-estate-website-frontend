@@ -14,6 +14,9 @@ export const loginUser = async (userData) => {
 export const getProperties = async (params) => {
     return await axios.get(`${API_URL}/properties`, params);
 };
+export const getRequests = async (params) => {
+    return await axios.get(`${API_URL}/contact/all`, params);
+};
 
 export const addProperty = async (propertyData) => {
     return await axios.post(`${API_URL}/properties`, propertyData);
